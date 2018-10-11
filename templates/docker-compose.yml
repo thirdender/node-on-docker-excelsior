@@ -1,0 +1,69 @@
+version: "3.3"
+
+networks:
+  internal:
+
+services:
+  traefik:
+    image: traefik:alpine
+    restart: always
+    networks:
+      - default
+      - internal
+    ports:
+      - 80:80
+      - 443:443
+    # labels:
+    #   - "traefik.port=8080"
+    #   - "traefik.frontend.rule=Host:${HOSTNAME};PathPrefixStrip:/traefik"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/traefik.toml
+      - ./acme.json:/acme.json
+    command: --api --docker
+
+  db:
+    restart: always
+    networks:
+      - internal
+    labels:
+      - "traefik.enable=false"
+
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - internal
+    ports:
+      - 8080:8080
+    labels:
+      - "traefik.backend=adminer"
+      - "traefik.docker.network=traefik"
+      - "traefik.frontend.rule=Host:${HOSTNAME};PathPrefixStrip:/adminer"
+      - "traefik.port=8080"
+
+  app:
+    build:
+      context: .
+    restart: always
+    networks:
+      - internal
+    ports:
+      - 3000:3000
+    labels:
+      - "traefik.backend=dashboard"
+      - "traefik.docker.network=traefik"
+      - "traefik.frontend.rule=Host:${HOSTNAME}"
+      - "traefik.port=3000"
+    environment:
+      - POSTGRES_PASSWORD
+    working_dir: /home/node/app
+    user: "node"
+    volumes:
+      # Bind mount the source code outside the container to the application
+      # directory inside the container
+      - ./:/home/node/app
+      # Instruct docker-compose to create a volume that stores the node_modules
+      # installed during the container build
+      - /home/node/app/node_modules
+    command: "npm start"

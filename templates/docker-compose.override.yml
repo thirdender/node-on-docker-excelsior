@@ -1,0 +1,37 @@
+version: "3.3"
+
+services:
+  # Modify the app so that source code is bind mounted into the container. This
+  # lets us make live changes to the source code and have them reflected inside
+  # the container. With this we can use nodemon to monitor source code changes
+  # and restart the app inside the container.
+  app:
+    volumes:
+      # Bind mount the source code outside the container to the application
+      # directory inside the container
+      - ./:/home/node/app
+      # Instruct docker-compose to create a volume that stores the node_modules
+      # installed during the container build
+      - /home/node/app/node_modules
+    # Use nodemon to monitor script changes and restart the app
+    command: "nodemon --exec npm start"
+
+  # Expose the Traefik UI at /traefik
+  traefik:
+    labels:
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:${HOSTNAME};PathPrefixStrip:/traefik"
+
+  # Include Adminer UI during development and expose at /adminer
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - internal
+    ports:
+      - 8080:8080
+    labels:
+      - "traefik.backend=adminer"
+      - "traefik.docker.network=traefik"
+      - "traefik.frontend.rule=Host:${HOSTNAME};PathPrefixStrip:/adminer"
+      - "traefik.port=8080"

@@ -1,0 +1,23 @@
+version: '3.3'
+services:
+  app:
+    volumes:
+      - './:/home/node/app'
+      - /home/node/app/node_modules
+    command: nodemon --exec npm start
+  traefik:
+    labels:
+      - traefik.port=8080
+      - 'traefik.frontend.rule=Host:${HOSTNAME};PathPrefixStrip:/traefik'
+  adminer:
+    image: adminer
+    restart: always
+    networks:
+      - internal
+    ports:
+      - '8080:8080'
+    labels:
+      - traefik.backend=adminer
+      - traefik.docker.network=traefik
+      - 'traefik.frontend.rule=Host:${HOSTNAME};PathPrefixStrip:/adminer'
+      - traefik.port=8080

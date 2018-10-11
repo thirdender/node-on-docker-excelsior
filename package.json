@@ -1,0 +1,32 @@
+{
+  "name": "node-on-docker-excelsior",
+  "version": "0.0.1",
+  "description": "CLI wizard to create Docker configs for a Node app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thirdender/node-on-docker-excelsior.git"
+  },
+  "keywords": [
+    "node",
+    "docker"
+  ],
+  "author": "Robert Rothermel <thirdender@gmail.com>",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/thirdender/node-on-docker-excelsior/issues"
+  },
+  "homepage": "https://github.com/thirdender/node-on-docker-excelsior#readme",
+  "dependencies": {
+    "commander": "^2.19.0",
+    "envfile": "^2.3.0",
+    "generate-password": "^1.4.0",
+    "inquirer": "^6.2.0",
+    "js-yaml": "^3.12.0",
+    "toml": "^2.3.3",
+    "tomlify-j0.4": "^3.0.0"
+  }
+}
